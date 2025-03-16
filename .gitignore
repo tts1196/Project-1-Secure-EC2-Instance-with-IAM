@@ -1,9 +1,0 @@
-# Ignore .ssh folder
-.ssh/
-
-# Ignore .terraform folder and lock file
-.terraform/
-.terraform.lock.hcl
-
-# Ignore notes file
-notes
