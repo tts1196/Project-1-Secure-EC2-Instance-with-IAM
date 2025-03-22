@@ -39,7 +39,8 @@ terraform-secure-ec2/
 
 ### 1️⃣ **Setup AWS & Terraform Cloud**
  Obtain **AWS Access Key & Secret Key** for the master user (Admin permissions).
-![week 1 - Frame 2](https://github.com/user-attachments/assets/b72928c3-f7a2-417e-8694-1f797b5be58e)
+![image](https://github.com/user-attachments/assets/540be879-5341-4b9f-893f-5d090f5669de)
+
 
 
 ---
@@ -63,31 +64,14 @@ provider "aws" {
 ```
 
 ---
-![image](https://github.com/user-attachments/assets/e36b7c05-4279-44e2-bd87-16a155f58884)
+![image](https://github.com/user-attachments/assets/0ded7ada-36b0-454a-bd34-f593c7b60fbc)
+
 
 ### 3️⃣ **Define Security Policies**
 - Create a **Security Group** that blocks all inbound traffic:
 
-```hcl
-resource "aws_security_group" "secure_sg" {
-  name        = "SecureSG"
-  description = "No inbound, unrestricted outbound"
+![image](https://github.com/user-attachments/assets/f045908e-10c4-4643-8df5-2ec8da968601)
 
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = []  # No inbound traffic
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]  # Allow all outbound
-  }
-}
-```
 
 ---
 
@@ -113,59 +97,16 @@ resource "aws_instance" "secure_ubuntu" {
 ### 5️⃣ **Create IAM Role for EC2 (SSM Access)**
 - Assign an **IAM Role** for EC2 to use AWS Systems Manager (SSM):
 
-```hcl
-resource "aws_iam_role" "ssm_role" {
-  name = "SSMRole"
+![image](https://github.com/user-attachments/assets/21e3d7e2-b73d-4c9d-8b03-6fd9e8ac2e85)
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [{
-      Effect = "Allow",
-      Principal = { Service = "ec2.amazonaws.com" },
-      Action = "sts:AssumeRole"
-    }]
-  })
-}
-
-resource "aws_iam_policy_attachment" "ssm_policy_attachment" {
-  name       = "SSMPolicyAttachment"
-  roles      = [aws_iam_role.ssm_role.name]
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
-
-resource "aws_iam_instance_profile" "ssm_instance_profile" {
-  name = "SSMInstanceProfile"
-  role = aws_iam_role.ssm_role.name
-}
-```
 
 ---
 
 ### 6️⃣ **Create IAM User for Developer**
 - Generate a **new IAM User** with limited EC2 & SSM permissions:
 
-```hcl
-resource "aws_iam_user" "dev_user" {
-  name = "DevUser"
-}
+![image](https://github.com/user-attachments/assets/27f4af12-c0e9-4727-aa5c-53137dbeff4d)
 
-resource "aws_iam_user_policy" "dev_user_policy" {
-  name = "DevUserPolicy"
-  user = aws_iam_user.dev_user.name
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [{
-      Effect = "Allow",
-      Action = [
-        "ssm:StartSession", "ssm:DescribeSessions", "ssm:TerminateSession",
-        "ec2:DescribeInstances", "ec2:DescribeTags"
-      ],
-      Resource = "*"
-    }]
-  })
-}
-```
 
 ---
 
@@ -201,6 +142,7 @@ output "dev_user_access_key" {
 ```sh
 aws ssm start-session --target <INSTANCE_ID>
 ```
+![image](https://github.com/user-attachments/assets/811cef80-5210-4a6f-b6d2-ab931a4acbef)
 
 ---
 
